@@ -7,6 +7,16 @@ const tokens = (n) => {
     return ethers.utils.parseUnits(n.toString(), 'ether');
 }
 
+// Global constants for example
+let transaction;
+const ID = 1;
+const NAME = "Drone";
+const CATEGORY = "Electronics";
+const IMAGE = "https://ipfs.io/ipfs/QmTYEboq8raiBs7GTUg2yLXB3PMz6HuBNgNfSZBx5Msztg/drone.jpg";
+const COST = tokens(1);
+const RATING = 4;
+const STOCK = 5;
+
 describe("Amazon Clone contract", function(){
     let Dapp;
     let hardhatDapp;
@@ -28,14 +38,6 @@ describe("Amazon Clone contract", function(){
     });
 
     describe("Listing", function(){
-        let transaction;
-        const ID = 1;
-        const NAME = "Drone";
-        const CATEGORY = "Electronics";
-        const IMAGE = "https://ipfs.io/ipfs/QmTYEboq8raiBs7GTUg2yLXB3PMz6HuBNgNfSZBx5Msztg/drone.jpg";
-        const COST = tokens(1);
-        const RATING = 4;
-        const STOCK = 5;
 
         beforeEach(async function(){
             transaction = await hardhatDapp.connect(deployer).listProducts(
@@ -43,11 +45,21 @@ describe("Amazon Clone contract", function(){
             );
 
             await transaction.wait();
-        })
+        });
 
         it("Returns list of transactions", async function(){
             const item = await hardhatDapp.items(1);
             expect(item.id).to.equal(ID);
+            expect(item.name).to.equal(NAME);
+            expect(item.category).to.equal(CATEGORY);
+            expect(item.image).to.equal(IMAGE);
+            expect(item.cost).to.equal(COST);
+            expect(item.rating).to.equal(RATING);
+            expect(item.stock).to.equal(STOCK);
+        });
+
+        it("Emits listProducts event", async function(){
+            expect(transaction).to.emit(hardhatDapp, "listProducts");
         })
     })
 })
