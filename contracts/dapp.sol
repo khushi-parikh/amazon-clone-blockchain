@@ -71,4 +71,11 @@ contract Dapp {
         emit BuyProducts(msg.sender, orderCount[msg.sender], _id);
 
     }
+
+    // Owner withdraws funds from smart contract
+    function withdrawFunds () public onlyOwner() {
+        // address(this) refers to address of smart contract
+        (bool success, ) = owner.call{value : address(this).balance}("");
+        require(success);
+    }
 }

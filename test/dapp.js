@@ -61,7 +61,7 @@ describe("Amazon Clone contract", function(){
 
         it("Emits listProducts event", async function(){
             expect(transaction).to.emit(hardhatDapp, "listProducts");
-        })
+        });
     });
 
     describe("Buying", function(){
@@ -80,7 +80,7 @@ describe("Amazon Clone contract", function(){
         it("Updates contract balance", async function() {
             const balance = await ethers.provider.getBalance(hardhatDapp.address);
             expect(balance).to.equal(COST);
-        })
+        });
 
         it("Updates buyers count order", async function() {
             const buyersCount = await hardhatDapp.orderCount(buyer.address);
@@ -98,6 +98,37 @@ describe("Amazon Clone contract", function(){
 
         it("Emits buyProduct event", function() {
             expect(transaction).to.emit(hardhatDapp, "BuyProducts")
+        });
+    });
+
+    describe("Withdrawing", function(){
+        beforeEach(async function(){
+            // Create the transaction
+            transaction = await hardhatDapp.connect(deployer).listProducts(
+                ID, NAME, CATEGORY, IMAGE, COST, RATING, STOCK
+            );
+            await transaction.wait();
+
+            // Buy an item
+            transaction = await hardhatDapp.connect(buyer).buyProduct(ID, {value : COST});
+            await transaction.wait();
+
+            //  Get contract balance
+            initialContractBalance = await hardhatDapp.provider.getBalance(hardhatDapp.address);
+
+            // Withdraw balance
+            transaction = await hardhatDapp.connect(deployer).withdrawFunds();
+            await transaction.wait();
+        });
+
+        it("Updates the contract balance", async function() {
+            const finalContractBalance = await ethers.provider.getBalance(hardhatDapp.address);
+            expect(finalContractBalance).to.equal(0);
+        });
+
+        it("Updates the owner balance", async function() {
+            const ownerBalance = await ethers.provider.getBalance(deployer.address);
+            expect(parseInt(ownerBalance)).to.be.greaterThan(parseInt(initialContractBalance));
         });
     })
 })
