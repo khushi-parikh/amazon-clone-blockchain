@@ -14,8 +14,18 @@ contract Dapp {
         uint stock;
     }
 
+    struct Order {
+        uint time;
+        Item item;
+    }
+
     mapping(uint => Item) public items;
     event ListProducts(string name, uint cost, uint stock);
+
+    mapping(address => uint) public orderCount;
+    // mapping buyers address to order count to order
+    mapping(address => mapping(uint => Order)) public orders;
+    event BuyProducts(address buyer, uint orderId, uint itemId);
 
     constructor() {
         owner = msg.sender;
@@ -37,5 +47,28 @@ contract Dapp {
 
             // Emit event for the same
             emit ListProducts(_name, _cost, _stock);
+    }
+
+    function buyProduct(uint _id) public payable {
+        // Fetch item
+        Item memory item = items[_id];
+
+        // Certain checks of stock and user balance
+        require(msg.value >= item.cost, "You do not have enough balance");
+        require(item.stock > 0, "Item is not in stock");
+
+        // Create order
+        Order memory order = Order(block.timestamp, item);
+
+        // Add order to list of orders
+        orderCount[msg.sender]++;
+        orders[msg.sender][orderCount[msg.sender]] = order;
+
+        // Subtract 1 from stock
+        items[_id].stock--;
+
+        // Emit event
+        emit BuyProducts(msg.sender, orderCount[msg.sender], _id);
+
     }
 }
