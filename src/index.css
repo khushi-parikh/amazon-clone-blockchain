@@ -60,6 +60,7 @@ nav {
   color: var(--clr-white);
   font-family: "Lalezar";
   font-size: 2.5em;
+  font-weight: 100;
 }
 
 .nav__links {
