@@ -40,8 +40,24 @@ In a separate terminal execute:
 `$ npx hardhat run ./scripts/deploy.js --network localhost`
 
 ### 6. Set configuration
-Copy Dapp deployment address and make changes in `src/config.example.json` <br>
+Copy Dapp(smart contract) deployment address and make changes in `src/config.example.json` <br>
 Rename `config.example.json` to `config.json`
 
 ### 7. Start frontend
 `$ npm run start`
+
+## Visuals
+### WebApp
+<p align="center">
+    <img src="./src/assets/readme_assets/full_page.png" width=700 >
+</p>
+
+### Product Page
+<p align="center">
+    <img src="./src/assets/readme_assets/product.JPG" width=700 >
+</p>
+
+### Demo
+<p align="center">
+    <img src="./src/assets/readme_assets/amazon_clone.gif" width=700 >
+</p>
