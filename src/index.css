@@ -306,7 +306,7 @@ nav {
   transition: all 250ms ease;
 }
 
-.product__buy:hover {
+.product__buy:hover, .product__buy:disabled {
   background-color: var(--clr-orange-dark);
 }
 

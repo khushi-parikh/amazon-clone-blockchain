@@ -6,13 +6,34 @@ import Rating from './Rating'
 
 import close from '../assets/close.svg'
 
-const Product = ({ item, provider, account, dappazon, togglePop }) => {
+const Product = ({ item, provider, account, dapp, togglePop }) => {
 
     const [order, setOrder] = useState(null);
+    const [hasBought, setHasBought] = useState(false)
 
-    const buyHandler = () => {
-        console.log("buying");
+    const buyHandler = async () => {
+        // Signer here refers to buyer which is the account we connect to 
+        const signer = await provider.getSigner();
+        let transaction = await dapp.connect(signer).buyProduct(item.id, {value : item.cost})
+        await transaction.wait();
+        setHasBought(true);
     }
+
+    const fetchOrders = async () => {
+        const events = await dapp.queryFilter("BuyProducts");
+        const orders = events.filter(
+            (event) => event.args.buyer === account && event.args.itemId.toString() === item.id.toString()
+        )
+
+        if(orders.length === 0) return;
+
+        const order = await dapp.orders(account, orders[orders.length-1].args.orderId);
+        setOrder(order);
+    }
+
+    useEffect(()=>{
+        fetchOrders();
+    },[hasBought])
 
     return (
         <div className="product">
@@ -48,7 +69,7 @@ const Product = ({ item, provider, account, dappazon, togglePop }) => {
 
                         {item.stock > 0 ? (<p>In stock</p>) : (<p>Out of stock</p>)}
 
-                        <button className='product__buy' onClick={buyHandler}>
+                        <button disabled={item.stock<=0} className='product__buy' onClick={buyHandler}>
                             Buy now
                         </button>
                     </p>
@@ -58,7 +79,7 @@ const Product = ({ item, provider, account, dappazon, togglePop }) => {
 
                     {order && (
                         <div className='product__bought'>
-                            Item bought on <br />
+                            Item last bought on <br />
                             <strong>
                                 {new Date(Number(order.time.toString() + '000')).toLocaleDateString(
                                     undefined,
